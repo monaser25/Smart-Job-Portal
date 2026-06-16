@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import PublicNavBar from '../../components/PublicNavBar';
 import PublicFooter from '../../components/PublicFooter';
+import Reveal from '../../motion/Reveal';
+import Stagger from '../../motion/Stagger';
 
 export default function AboutPage() {
   const { t } = useTranslation();
@@ -11,52 +13,58 @@ export default function AboutPage() {
         {/* Main Content Canvas */}
         <main className="flex-grow">
           {/* Hero Section */}
-          <section className="py-24 px-margin-desktop bg-surface-container-lowest max-w-container-max-width mx-auto text-center">
+          <Reveal whenInView as="section" className="py-24 px-margin-desktop bg-surface-container-lowest max-w-container-max-width mx-auto text-center">
             <h1 className="font-h1 text-h1 text-primary-container max-w-4xl mx-auto mb-stack-lg">{t('about.heroTitle')}</h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-12">{t('about.heroDescription')}</p>
             <div className="w-full max-w-5xl mx-auto h-96 bg-surface-container-high rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(15,23,42,0.05)]" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAOQ927tvzzSUoaZMLL3GbOrCQeVueGan8RxYqpW36EuJTFu9GrDpKHsZ-8HHbEF4DB9p3Y3tN70Q_9cYrLuRMjzrN2FBIBUwi1teX9HsDjKB_GOHz9fCHDaGV_z9oaMpKOdSuCByO3qpo6NVMKrYhed00w_PnxgdxMMiWjosbOfTf8wo0Crx4lqx-Dhx-_E9NE2Ya7LZEph9e-Oe0HI_DHcJJERk5s-FijByum-V-7GWRbgsKYZuUSu9hwJIOY-DITRxyAizwEnRUM")', backgroundSize: 'cover', backgroundPosition: 'center'}}>
             </div>
-          </section>
+          </Reveal>
           {/* Platform Vision Statement */}
-          <section className="py-20 px-margin-desktop bg-surface-container-low border-y border-outline-variant/20">
+          <Reveal whenInView as="section" className="py-20 px-margin-desktop bg-surface-container-low border-y border-outline-variant/20">
             <div className="max-w-3xl mx-auto text-center">
               <span className="material-symbols-outlined text-secondary text-5xl mb-stack-md block">psychology</span>
               <h2 className="font-h2 text-h2 text-primary-container mb-stack-md">{t('about.visionTitle')}</h2>
               <p className="font-body-lg text-body-lg text-on-surface-variant">{t('about.visionDescription')}</p>
             </div>
-          </section>
+          </Reveal>
           {/* AI Feature Block (Bento Grid) */}
           <section className="py-24 px-margin-desktop max-w-container-max-width mx-auto">
-            <div className="mb-16 text-center">
+            <Reveal whenInView className="mb-16 text-center">
               <h2 className="font-h1 text-h1 text-primary-container mb-stack-sm">{t('about.scienceTitle')}</h2>
               <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">{t('about.scienceSubtitle')}</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            </Reveal>
+            <Stagger whenInView className="grid grid-cols-1 md:grid-cols-3 gap-gutter" delayChildren={0.08} staggerChildren={0.08}>
               {/* Card 1 */}
-              <div className="bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] hover:shadow-[0px_10px_30px_rgba(15,23,42,0.10)] hover:-translate-y-1 transition-all duration-300 border border-outline-variant/10">
-                <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-stack-md">
-                  <span className="material-symbols-outlined text-secondary">balance</span>
+              <Stagger.Item className="h-full">
+                <div className="h-full bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] hover:shadow-[0px_10px_30px_rgba(15,23,42,0.10)] hover:-translate-y-1 transition-all duration-300 border border-outline-variant/10">
+                  <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-stack-md">
+                    <span className="material-symbols-outlined text-secondary">balance</span>
+                  </div>
+                  <h3 className="font-h3 text-h3 text-primary-container mb-stack-sm">{t('about.features.fairness.title')}</h3>
+                  <p className="font-body-md text-body-md text-on-surface-variant">{t('about.features.fairness.description')}</p>
                 </div>
-                <h3 className="font-h3 text-h3 text-primary-container mb-stack-sm">{t('about.features.fairness.title')}</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant">{t('about.features.fairness.description')}</p>
-              </div>
+              </Stagger.Item>
               {/* Card 2 */}
-              <div className="bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] hover:shadow-[0px_10px_30px_rgba(15,23,42,0.10)] hover:-translate-y-1 transition-all duration-300 border border-outline-variant/10">
-                <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-stack-md">
-                  <span className="material-symbols-outlined text-secondary">my_location</span>
+              <Stagger.Item className="h-full">
+                <div className="h-full bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] hover:shadow-[0px_10px_30px_rgba(15,23,42,0.10)] hover:-translate-y-1 transition-all duration-300 border border-outline-variant/10">
+                  <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-stack-md">
+                    <span className="material-symbols-outlined text-secondary">my_location</span>
+                  </div>
+                  <h3 className="font-h3 text-h3 text-primary-container mb-stack-sm">{t('about.features.precision.title')}</h3>
+                  <p className="font-body-md text-body-md text-on-surface-variant">{t('about.features.precision.description')}</p>
                 </div>
-                <h3 className="font-h3 text-h3 text-primary-container mb-stack-sm">{t('about.features.precision.title')}</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant">{t('about.features.precision.description')}</p>
-              </div>
+              </Stagger.Item>
               {/* Card 3 */}
-              <div className="bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] hover:shadow-[0px_10px_30px_rgba(15,23,42,0.10)] hover:-translate-y-1 transition-all duration-300 border border-outline-variant/10">
-                <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-stack-md">
-                  <span className="material-symbols-outlined text-secondary">bolt</span>
+              <Stagger.Item className="h-full">
+                <div className="h-full bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] hover:shadow-[0px_10px_30px_rgba(15,23,42,0.10)] hover:-translate-y-1 transition-all duration-300 border border-outline-variant/10">
+                  <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-stack-md">
+                    <span className="material-symbols-outlined text-secondary">bolt</span>
+                  </div>
+                  <h3 className="font-h3 text-h3 text-primary-container mb-stack-sm">{t('about.features.velocity.title')}</h3>
+                  <p className="font-body-md text-body-md text-on-surface-variant">{t('about.features.velocity.description')}</p>
                 </div>
-                <h3 className="font-h3 text-h3 text-primary-container mb-stack-sm">{t('about.features.velocity.title')}</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant">{t('about.features.velocity.description')}</p>
-              </div>
-            </div>
+              </Stagger.Item>
+            </Stagger>
           </section>
           {/* Dual Audiences (Asymmetric Layout) */}
           <section className="py-24 px-margin-desktop bg-surface-container-low">

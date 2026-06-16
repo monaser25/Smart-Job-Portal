@@ -6,6 +6,8 @@ import PublicNavBar from '../../components/PublicNavBar';
 import { getPublicCompanyById, getPublicJobs } from '../../services/publicDataService';
 import { useAuth } from '../../context/useAuth';
 import { useToast } from '../../components/useToast';
+import Reveal from '../../motion/Reveal';
+import Stagger from '../../motion/Stagger';
 
 import PublicFooter from '../../components/PublicFooter';
 
@@ -139,13 +141,13 @@ export default function PublicCompanyProfilePage() {
       )}
 
       <main className="mx-auto w-full max-w-7xl flex-grow space-y-gutter px-gutter py-margin-desktop lg:px-margin-desktop">
-        <nav className="flex items-center gap-2 text-on-surface-variant font-body-md mb-6">
+        <Reveal whenInView as="nav" className="flex items-center gap-2 text-on-surface-variant font-body-md mb-6">
           <Link className="hover:text-secondary transition-colors" to={ROUTES.COMPANIES}>{t('companyDetails.breadcrumb')}</Link>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
           <span className="text-primary font-semibold">{company.name}</span>
-        </nav>
+        </Reveal>
 
-        <section className="bg-surface-container-lowest rounded-xl p-stack-xl shadow-ambient border border-outline-variant flex flex-col md:flex-row items-start md:items-center gap-stack-lg relative overflow-hidden">
+        <Reveal whenInView as="section" className="bg-surface-container-lowest rounded-xl p-stack-xl shadow-ambient border border-outline-variant flex flex-col md:flex-row items-start md:items-center gap-stack-lg relative overflow-hidden">
           <div className="absolute top-0 end-0 p-8 opacity-5 transform translate-x-1/4 -translate-y-1/4 pointer-events-none">
             <span className="material-symbols-outlined text-[200px]" style={{ fontVariationSettings: '"FILL" 1' }}>domain</span>
           </div>
@@ -179,7 +181,7 @@ export default function PublicCompanyProfilePage() {
               {company.website && <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[18px]">language</span> <a href={websiteHref(company.website)} target="_blank" rel="noreferrer" className="text-secondary hover:underline text-body-sm">{displayUrl(company.website)}</a></span>}
             </div>
           </div>
-        </section>
+        </Reveal>
 
         <div className="grid grid-cols-1 gap-gutter lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="space-y-gutter">
@@ -203,44 +205,46 @@ export default function PublicCompanyProfilePage() {
               </div>
 
               {jobs.length ? (
-                <div className="grid grid-cols-1 gap-4">
+                <Stagger whenInView className="grid grid-cols-1 gap-4" delayChildren={0.06} staggerChildren={0.06}>
                   {jobs.map((job) => {
                     const salary = formatSalary(job);
                     const skills = job.requiredSkills || [];
 
                     return (
-                      <Link key={job.id} to={`/jobs/${job.id}`} className="group block rounded-xl border border-outline-variant bg-surface-container-low p-5 transition-colors hover:border-secondary hover:bg-surface-container-high">
-                        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                          <div className="min-w-0 flex-1">
-                            <div className="mb-2 flex flex-wrap items-center gap-2">
-                              <span className="rounded-full bg-secondary-container px-3 py-1 font-label-sm text-label-sm text-on-secondary-container">{job.category ? t(`categories.${job.category}`, { defaultValue: job.category }) : t('companyDetails.defaultCategory')}</span>
-                              <span className="text-outline text-xs">{t('companyDetails.postedAt', { date: formatPostedDate(job.postedAt) })}</span>
+                      <Stagger.Item key={job.id}>
+                        <Link to={`/jobs/${job.id}`} className="group block rounded-xl border border-outline-variant bg-surface-container-low p-5 transition-colors hover:border-secondary hover:bg-surface-container-high">
+                          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                            <div className="min-w-0 flex-1">
+                              <div className="mb-2 flex flex-wrap items-center gap-2">
+                                <span className="rounded-full bg-secondary-container px-3 py-1 font-label-sm text-label-sm text-on-secondary-container">{job.category ? t(`categories.${job.category}`, { defaultValue: job.category }) : t('companyDetails.defaultCategory')}</span>
+                                <span className="text-outline text-xs">{t('companyDetails.postedAt', { date: formatPostedDate(job.postedAt) })}</span>
+                              </div>
+                              <h3 className="font-h3 text-h3 text-primary transition-colors group-hover:text-secondary">{job.title}</h3>
+                              {job.description && <p className="mt-2 max-w-3xl text-sm leading-6 text-on-surface-variant">{job.description}</p>}
                             </div>
-                            <h3 className="font-h3 text-h3 text-primary transition-colors group-hover:text-secondary">{job.title}</h3>
-                            {job.description && <p className="mt-2 max-w-3xl text-sm leading-6 text-on-surface-variant">{job.description}</p>}
+                            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-secondary opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+                              <span className="material-symbols-outlined">arrow_forward</span>
+                            </span>
                           </div>
-                          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-secondary opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
-                            <span className="material-symbols-outlined">arrow_forward</span>
-                          </span>
-                        </div>
 
-                        <div className="mt-4 flex flex-wrap gap-2 text-on-surface-variant">
-                          <span className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-sm"><span className="material-symbols-outlined text-[16px]">location_on</span>{job.location}</span>
-                          <span className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-sm"><span className="material-symbols-outlined text-[16px]">schedule</span>{formatJobType(job.type)}</span>
-                          {job.workMode && <span className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-sm"><span className="material-symbols-outlined text-[16px]">hub</span>{job.workMode}</span>}
-                          {salary && <span className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-sm"><span className="material-symbols-outlined text-[16px]">payments</span>{salary}</span>}
-                        </div>
-
-                        {skills.length > 0 && (
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            {skills.slice(0, 5).map((skill) => <span key={skill} className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-on-surface-variant border border-outline-variant">{skill}</span>)}
-                            {skills.length > 5 && <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-on-surface-variant border border-outline-variant">{t('companyDetails.moreSkills', { count: skills.length - 5 })}</span>}
+                          <div className="mt-4 flex flex-wrap gap-2 text-on-surface-variant">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-sm"><span className="material-symbols-outlined text-[16px]">location_on</span>{job.location}</span>
+                            <span className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-sm"><span className="material-symbols-outlined text-[16px]">schedule</span>{formatJobType(job.type)}</span>
+                            {job.workMode && <span className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-sm"><span className="material-symbols-outlined text-[16px]">hub</span>{job.workMode}</span>}
+                            {salary && <span className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-sm"><span className="material-symbols-outlined text-[16px]">payments</span>{salary}</span>}
                           </div>
-                        )}
-                      </Link>
+
+                          {skills.length > 0 && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {skills.slice(0, 5).map((skill) => <span key={skill} className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-on-surface-variant border border-outline-variant">{skill}</span>)}
+                              {skills.length > 5 && <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-on-surface-variant border border-outline-variant">{t('companyDetails.moreSkills', { count: skills.length - 5 })}</span>}
+                            </div>
+                          )}
+                        </Link>
+                      </Stagger.Item>
                     );
                   })}
-                </div>
+                </Stagger>
               ) : (
                 <div className="rounded-xl border border-dashed border-outline-variant bg-surface-container-low p-8 text-center">
                   <span className="material-symbols-outlined text-[42px] text-outline">work_off</span>

@@ -1162,7 +1162,8 @@
       "unknownCompany": "Unknown Company",
       "aiMatchScore": "AI Match Score",
       "aiMatchTooltip": "AI match score is based on your skills and the job requirements.",
-      "system": "System"
+      "system": "System",
+      "backToTop": "Back to top"
     },
     "empty": {
       "nothingFound": "Nothing found",

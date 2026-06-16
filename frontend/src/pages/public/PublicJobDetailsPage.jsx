@@ -7,6 +7,8 @@ import { getPublicJobById } from '../../services/publicDataService';
 import { isJobSaved, toggleSavedJob, trackJobView } from '../../services/jobSeekerDataService';
 import { adminApi } from '../../api/adminApi';
 import { useAuth } from '../../context/useAuth';
+import Reveal from '../../motion/Reveal';
+import Stagger from '../../motion/Stagger';
 
 import PublicFooter from '../../components/PublicFooter';
 
@@ -138,14 +140,14 @@ export default function PublicJobDetailsPage() {
       )}
 
       <main className="flex-grow w-full max-w-7xl mx-auto px-gutter lg:px-margin-desktop py-12 flex flex-col gap-8">
-        <nav className="flex items-center gap-2 text-on-surface-variant font-body-md">
+        <Reveal whenInView as="nav" className="flex items-center gap-2 text-on-surface-variant font-body-md">
           <Link className="hover:text-secondary transition-colors" to={ROUTES.JOBS}>{t('jobDetails.breadcrumb')}</Link>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
           <span className="text-primary font-semibold">{job.title}</span>
-        </nav>
+        </Reveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-          <div className="lg:col-span-8 flex flex-col gap-stack-lg">
+        <Stagger whenInView className="grid grid-cols-1 lg:grid-cols-12 gap-gutter" delayChildren={0.08} staggerChildren={0.08}>
+          <Stagger.Item className="lg:col-span-8 flex flex-col gap-stack-lg">
             {/* Header Card */}
             <div className="bg-surface-container-lowest rounded-[16px] p-stack-xl shadow-sm border border-outline-variant flex flex-col gap-stack-md">
               <div className="flex items-center gap-stack-md">
@@ -221,9 +223,9 @@ export default function PublicJobDetailsPage() {
                 </div>
               )}
             </div>
-          </div>
+          </Stagger.Item>
 
-          <div className="lg:col-span-4 flex flex-col gap-stack-lg">
+          <Stagger.Item className="lg:col-span-4 flex flex-col gap-stack-lg">
             <div className="bg-surface-container-lowest rounded-[16px] p-stack-lg shadow-sm border border-outline-variant flex flex-col gap-stack-md">
               <h3 className="font-h3 text-h3 text-primary">{t('jobDetails.aboutCompany', { name: job.company })}</h3>
               <p className="font-body-md text-on-surface-variant">{job.companyInfo?.description || t('jobDetails.noCompanyInfo')}</p>
@@ -238,8 +240,8 @@ export default function PublicJobDetailsPage() {
                 </Link>
               )}
             </div>
-          </div>
-        </div>
+          </Stagger.Item>
+        </Stagger>
       </main>
       <PublicFooter />
     </div>

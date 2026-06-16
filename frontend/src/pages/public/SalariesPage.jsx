@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import PublicNavBar from '../../components/PublicNavBar';
 import PublicFooter from '../../components/PublicFooter';
 import { getPublicJobs } from '../../services/publicDataService';
+import Reveal from '../../motion/Reveal';
+import Stagger from '../../motion/Stagger';
 
 export default function SalariesPage() {
   const { t } = useTranslation();
@@ -82,7 +84,7 @@ export default function SalariesPage() {
       <PublicNavBar />
 
       <main className="max-w-container mx-auto px-gutter py-margin-desktop space-y-gutter">
-        <section className="bg-surface-container-lowest rounded-xl p-stack-lg shadow-ambient border border-outline-variant">
+        <Reveal whenInView as="section" className="bg-surface-container-lowest rounded-xl p-stack-lg shadow-ambient border border-outline-variant">
           <p className="font-label-sm text-label-sm uppercase tracking-wider text-secondary mb-stack-sm">{t('salariesPage.eyebrow')}</p>
           <h1 className="font-display text-display text-primary mb-stack-sm">{t('salariesPage.title')}</h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
@@ -110,7 +112,7 @@ export default function SalariesPage() {
               />
             </label>
           </div>
-        </section>
+        </Reveal>
 
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -123,19 +125,21 @@ export default function SalariesPage() {
             <p className="text-on-surface-variant">{t('salariesPage.emptyHelp')}</p>
           </div>
         ) : (
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+          <Stagger whenInView as="section" className="grid grid-cols-1 md:grid-cols-3 gap-gutter" delayChildren={0.08} staggerChildren={0.07}>
             {salaryData.map((item, index) => (
-              <article className="bg-surface-container-lowest rounded-xl p-stack-lg border border-outline-variant shadow-ambient hover:shadow-hover hover:-translate-y-1 transition-all" key={index}>
-                <div className="flex items-center justify-between mb-stack-md">
-                  <span className="material-symbols-outlined text-secondary">payments</span>
-                  <span className="font-label-md text-label-md text-white bg-secondary-container px-stack-sm py-unit rounded-full">{item.trend}</span>
-                </div>
-                <h2 className="font-h2 text-h2 text-primary">{item.role}</h2>
-                <p className="font-display text-[32px] leading-tight text-primary mt-stack-md">{item.range}</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-unit">{t('salariesPage.basedOn', { count: item.count })}</p>
-              </article>
+              <Stagger.Item key={index} className="h-full">
+                <article className="h-full bg-surface-container-lowest rounded-xl p-stack-lg border border-outline-variant shadow-ambient hover:shadow-hover hover:-translate-y-1 transition-all">
+                  <div className="flex items-center justify-between mb-stack-md">
+                    <span className="material-symbols-outlined text-secondary">payments</span>
+                    <span className="font-label-md text-label-md text-white bg-secondary-container px-stack-sm py-unit rounded-full">{item.trend}</span>
+                  </div>
+                  <h2 className="font-h2 text-h2 text-primary">{item.role}</h2>
+                  <p className="font-display text-[32px] leading-tight text-primary mt-stack-md">{item.range}</p>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant mt-unit">{t('salariesPage.basedOn', { count: item.count })}</p>
+                </article>
+              </Stagger.Item>
             ))}
-          </section>
+          </Stagger>
         )}
       </main>
       <PublicFooter />

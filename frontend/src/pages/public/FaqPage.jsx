@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../utils/constants';
 import PublicNavBar from '../../components/PublicNavBar';
 import PublicFooter from '../../components/PublicFooter';
+import Reveal from '../../motion/Reveal';
+import Stagger from '../../motion/Stagger';
+import { EASE } from '../../motion/variants';
 
 const FAQ_DATA = [
   {
@@ -18,6 +22,7 @@ const FAQ_DATA = [
 
 export default function FaqPage() {
   const { t } = useTranslation();
+  const reduce = useReducedMotion();
   const [openItem, setOpenItem] = useState('account-0');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('account');
@@ -44,7 +49,7 @@ export default function FaqPage() {
         <PublicNavBar />
         <main className="flex-grow flex flex-col items-center w-full">
           {/* Hero Section */}
-          <section className="w-full bg-surface-container-lowest py-[80px] px-margin-desktop flex flex-col items-center justify-center border-b border-surface-container-high relative overflow-hidden">
+          <Reveal whenInView as="section" className="w-full bg-surface-container-lowest py-[80px] px-margin-desktop flex flex-col items-center justify-center border-b border-surface-container-high relative overflow-hidden">
             <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #131b2e 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
             <div className="max-w-[800px] w-full text-center relative z-10">
               <h1 className="font-h1 text-h1 text-primary mb-stack-md">{t('faq.title')}</h1>
@@ -70,17 +75,18 @@ export default function FaqPage() {
                 )}
               </div>
             </div>
-          </section>
+          </Reveal>
           {/* Main Content Layout */}
           <section className="w-full max-w-container-max-width mx-auto px-margin-desktop py-[64px] flex flex-col md:flex-row gap-gutter">
             {/* Sidebar Navigation */}
             <aside className="w-full md:w-[280px] shrink-0">
               <div className="sticky top-[100px] bg-surface-container-lowest rounded-xl p-stack-md shadow-[0px_4px_20px_rgba(15,23,42,0.05)] border border-surface-container-high">
                 <h3 className="font-label-sm text-label-sm text-on-surface-variant mb-stack-sm px-3 tracking-widest uppercase">{t('faq.categoriesHeader')}</h3>
-                <nav className="flex flex-col gap-1">
+                <Stagger whenInView as="nav" className="flex flex-col gap-1" delayChildren={0.05} staggerChildren={0.05}>
                   {FAQ_DATA.map((cat) => (
-                    <a
+                    <Stagger.Item
                       key={cat.id}
+                      as="a"
                       className={`flex items-center justify-between px-3 py-2 font-body-md rounded-lg transition-colors border-s-4 cursor-pointer ${
                         activeCategory === cat.id
                           ? 'bg-surface-container-low text-primary font-semibold border-[#2563EB]'
@@ -93,9 +99,9 @@ export default function FaqPage() {
                       {activeCategory === cat.id && (
                         <span className="material-symbols-outlined text-sm">chevron_right</span>
                       )}
-                    </a>
+                    </Stagger.Item>
                   ))}
-                </nav>
+                </Stagger>
               </div>
             </aside>
             {/* FAQ Accordion Content */}
@@ -115,6 +121,18 @@ export default function FaqPage() {
                       const key = `${cat.id}-${idx}`;
                       const isOpen = openItem === key;
                       const tip = t(`faq.items.${itemKey}.tip`, { defaultValue: '' });
+                      const answerContent = (
+                        <>
+                          <p className="font-body-md text-body-md text-on-surface-variant mb-4">{t(`faq.items.${itemKey}.a`)}</p>
+                          {tip && (
+                            <div className="bg-surface-container-low p-4 rounded-lg flex items-start gap-3">
+                              <span className="material-symbols-outlined text-[#3B82F6] mt-0.5">info</span>
+                              <p className="font-body-md text-body-md text-on-surface text-sm">{tip}</p>
+                            </div>
+                          )}
+                        </>
+                      );
+
                       return (
                         <div key={key} className="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] border border-surface-container-high overflow-hidden">
                           <button
@@ -124,16 +142,28 @@ export default function FaqPage() {
                             <span className="font-h3 text-h3 text-primary group-hover:text-[#2563EB] transition-colors">{t(`faq.items.${itemKey}.q`)}</span>
                             <span className={`material-symbols-outlined text-outline transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>expand_more</span>
                           </button>
-                          {isOpen && (
-                            <div className="px-stack-lg pb-6 pt-2 border-t border-surface-container-low">
-                              <p className="font-body-md text-body-md text-on-surface-variant mb-4">{t(`faq.items.${itemKey}.a`)}</p>
-                              {tip && (
-                                <div className="bg-surface-container-low p-4 rounded-lg flex items-start gap-3">
-                                  <span className="material-symbols-outlined text-[#3B82F6] mt-0.5">info</span>
-                                  <p className="font-body-md text-body-md text-on-surface text-sm">{tip}</p>
-                                </div>
+                          {reduce ? (
+                            isOpen && (
+                              <div className="px-stack-lg pb-6 pt-2 border-t border-surface-container-low">
+                                {answerContent}
+                              </div>
+                            )
+                          ) : (
+                            <AnimatePresence initial={false}>
+                              {isOpen && (
+                                <motion.div
+                                  className="overflow-hidden border-t border-surface-container-low"
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.25, ease: EASE }}
+                                >
+                                  <div className="px-stack-lg pb-6 pt-2">
+                                    {answerContent}
+                                  </div>
+                                </motion.div>
                               )}
-                            </div>
+                            </AnimatePresence>
                           )}
                         </div>
                       );
