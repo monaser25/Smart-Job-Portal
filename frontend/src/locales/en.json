@@ -1795,6 +1795,7 @@
     "heroBadge": "AI-Powered Job Matching",
     "heroTitleLine1": "Find Your Dream Job,",
     "heroTitleLine2": "Smarter & Faster.",
+    "heroTypingPhrases": ["Smarter & Faster.", "With AI Matching.", "At Top Companies.", "On Your Terms."],
     "heroDescription": "Join the next-generation job platform. Smart Job Portal uses advanced AI to match your unique skills with the right opportunities at top companies worldwide.",
     "searchJobPlaceholder": "Job title, keywords, or company",
     "searchLocationPlaceholder": "City, state, or remote",
