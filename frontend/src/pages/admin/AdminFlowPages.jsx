@@ -16,6 +16,8 @@ import { adminDataService } from '../../services/adminDataService';
 import { adminApi } from '../../api/adminApi';
 import { useAuth } from '../../context/useAuth';
 import { ROUTES } from '../../utils/constants';
+import Stagger from '../../motion/Stagger';
+import Reveal from '../../motion/Reveal';
 
 const buttonPrimary = 'inline-flex items-center justify-center gap-unit bg-secondary text-on-secondary px-stack-md py-stack-sm rounded-lg font-h3 text-h3 shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed';
 const buttonSecondary = 'inline-flex items-center justify-center gap-unit border border-outline-variant text-primary px-stack-md py-stack-sm rounded-lg font-h3 text-h3 hover:bg-surface-container-low transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
@@ -231,16 +233,28 @@ export function AdminDashboard() {
         title={t('adminFlow.dashboard.title')}
         description={t('adminFlow.dashboard.description')}
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-8">
-        <AdminStatsCard icon="group" label={t('adminFlow.dashboard.totalUsers')} to={ROUTES.ADMIN_USERS} value={data.metrics?.totalUsers ?? 0} />
-        <AdminStatsCard icon="person_search" label={t('adminFlow.dashboard.jobSeekers')} to={ROUTES.ADMIN_USERS} value={data.metrics?.jobSeekers ?? 0} />
-        <AdminStatsCard icon="domain" label={t('adminFlow.dashboard.companies')} to={ROUTES.ADMIN_USERS} value={data.metrics?.companies ?? 0} />
-        <AdminStatsCard icon="work" label={t('adminFlow.dashboard.activeJobs')} to={ROUTES.ADMIN_JOBS} value={data.metrics?.activeJobs ?? 0} />
-        <AdminStatsCard icon="assignment" label={t('adminFlow.dashboard.totalApplications')} to={ROUTES.ADMIN_JOBS} value={data.metrics?.totalApplications ?? 0} />
-        <AdminStatsCard icon="block" label={t('adminFlow.dashboard.bannedUsers')} to={ROUTES.ADMIN_USERS} value={data.metrics?.bannedUsers ?? 0} />
-      </div>
+      <Stagger as="div" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-8" delayChildren={0.05} staggerChildren={0.07}>
+        <Stagger.Item>
+          <AdminStatsCard icon="group" label={t('adminFlow.dashboard.totalUsers')} to={ROUTES.ADMIN_USERS} value={data.metrics?.totalUsers ?? 0} />
+        </Stagger.Item>
+        <Stagger.Item>
+          <AdminStatsCard icon="person_search" label={t('adminFlow.dashboard.jobSeekers')} to={ROUTES.ADMIN_USERS} value={data.metrics?.jobSeekers ?? 0} />
+        </Stagger.Item>
+        <Stagger.Item>
+          <AdminStatsCard icon="domain" label={t('adminFlow.dashboard.companies')} to={ROUTES.ADMIN_USERS} value={data.metrics?.companies ?? 0} />
+        </Stagger.Item>
+        <Stagger.Item>
+          <AdminStatsCard icon="work" label={t('adminFlow.dashboard.activeJobs')} to={ROUTES.ADMIN_JOBS} value={data.metrics?.activeJobs ?? 0} />
+        </Stagger.Item>
+        <Stagger.Item>
+          <AdminStatsCard icon="assignment" label={t('adminFlow.dashboard.totalApplications')} to={ROUTES.ADMIN_JOBS} value={data.metrics?.totalApplications ?? 0} />
+        </Stagger.Item>
+        <Stagger.Item>
+          <AdminStatsCard icon="block" label={t('adminFlow.dashboard.bannedUsers')} to={ROUTES.ADMIN_USERS} value={data.metrics?.bannedUsers ?? 0} />
+        </Stagger.Item>
+      </Stagger>
 
-      <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+      <Reveal as="section" className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8" whenInView>
         <Section title={t('adminFlow.dashboard.recentUsers')}>
           {data.recentUsers?.map((user) => (
             <Link className="flex items-center justify-between border-b border-outline-variant py-stack-md last:border-b-0 hover:bg-surface-container-low rounded-lg px-stack-sm transition-colors" key={user.id} to={`/admin/users/${user.id}`}>
@@ -265,14 +279,14 @@ export function AdminDashboard() {
           ))}
           {!data.recentJobs?.length && <p className="text-on-surface-variant p-4">{t('adminFlow.dashboard.noRecentJobs')}</p>}
         </Section>
-      </section>
+      </Reveal>
 
-      <section className="grid grid-cols-1 gap-8 mb-8">
+      <Reveal as="section" className="grid grid-cols-1 gap-8 mb-8" whenInView>
         <Section title={t('adminFlow.dashboard.recentActivity')}>
           {data.recentActivity?.map((item) => <AdminActivityItem item={item} key={item.id} />)}
           {!data.recentActivity?.length && <p className="text-on-surface-variant p-4">{t('adminFlow.dashboard.noRecentActivity')}</p>}
         </Section>
-      </section>
+      </Reveal>
     </>
   );
 }

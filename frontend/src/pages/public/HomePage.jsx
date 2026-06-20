@@ -6,6 +6,7 @@ import { ROUTES } from '../../utils/constants';
 import Reveal from '../../motion/Reveal';
 import Stagger from '../../motion/Stagger';
 import AnimatedCounter from '../../motion/AnimatedCounter';
+import Typewriter from '../../motion/Typewriter';
 import PublicNavBar from '../../components/PublicNavBar';
 import PublicFooter from '../../components/PublicFooter';
 import { EASE, SPRING_PRESS } from '../../motion/variants';
@@ -38,6 +39,10 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const reduce = useReducedMotion();
   const navigate = useNavigate();
+  const translatedTypingPhrases = t('home.heroTypingPhrases', { returnObjects: true });
+  const heroTypingPhrases = Array.isArray(translatedTypingPhrases)
+    ? translatedTypingPhrases
+    : [t('home.heroTitleLine2')];
 
   const jobInputRef = useRef(null);
   const locationInputRef = useRef(null);
@@ -193,7 +198,12 @@ export default function HomePage() {
 
               <Stagger.Item as="h1">
                 <span className="block font-h1 text-[clamp(2.5rem,7vw,4.5rem)] font-bold text-primary mb-stack-md leading-[1.05] tracking-tight">
-                  {t('home.heroTitleLine1')}<br />{t('home.heroTitleLine2')}
+                  {t('home.heroTitleLine1')}<br />
+                  <Typewriter
+                    phrases={heroTypingPhrases}
+                    className="inline-block min-h-[1.05em]"
+                    caretClassName="text-secondary dark:text-secondary-fixed"
+                  />
                 </span>
               </Stagger.Item>
 
@@ -283,9 +293,15 @@ export default function HomePage() {
                 <div className="mt-6 flex items-center justify-center gap-2 flex-wrap text-on-surface-variant font-body-md">
                   <span className="text-outline dark:text-white">{t('home.popular')}</span>
                   {popularSearches.map((term) => (
-                    <Link key={term} to={`${ROUTES.JOBS}?search=${encodeURIComponent(term)}`} className="px-3 py-1 rounded-full border border-outline-variant hover:border-secondary hover:text-secondary dark:hover:text-secondary-fixed dark:hover:border-secondary-fixed transition-all duration-200 ease-out text-sm">
-                      {term}
-                    </Link>
+                    <motion.div
+                      key={term}
+                      whileHover={reduce ? undefined : { y: -2, transition: { duration: 0.2, ease: EASE } }}
+                      whileTap={reduce ? undefined : { scale: 0.96, transition: SPRING_PRESS }}
+                    >
+                      <Link to={`${ROUTES.JOBS}?search=${encodeURIComponent(term)}`} className="px-3 py-1 rounded-full border border-outline-variant hover:border-secondary hover:text-secondary dark:hover:text-secondary-fixed dark:hover:border-secondary-fixed transition-all duration-200 ease-out text-sm">
+                        {term}
+                      </Link>
+                    </motion.div>
                   ))}
                 </div>
               </Stagger.Item>

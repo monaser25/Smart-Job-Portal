@@ -6,6 +6,8 @@ import { RoleRoute } from './routes/RoleRoute';
 
 import JobSeekerLayout from './layouts/JobSeekerLayout';
 import GlobalCompanyWatcher from './components/GlobalCompanyWatcher';
+import BackToTop from './components/BackToTop';
+import ScrollProgress from './motion/ScrollProgress';
 
 function App() {
   const renderRoute = (route) => {
@@ -33,6 +35,8 @@ function App() {
   return (
     <>
       <GlobalCompanyWatcher />
+      <ScrollProgress />
+      <BackToTop />
       <Routes>
         {appRoutes.map(renderRoute)}
         <Route path="*" element={<Navigate to="/404" replace />} />

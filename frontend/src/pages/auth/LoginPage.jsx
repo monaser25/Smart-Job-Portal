@@ -9,6 +9,7 @@ import { useAuth } from '../../context/useAuth';
 import { normalizeApiError } from '../../utils/apiError';
 import Stagger from '../../motion/Stagger';
 import Reveal from '../../motion/Reveal';
+import Typewriter from '../../motion/Typewriter';
 import { SPRING_PRESS, EASE } from '../../motion/variants';
 import icon from '../../assets/icon.png';
 
@@ -39,6 +40,10 @@ export default function LoginPage() {
   const { addToast } = useToast();
   const reduce = useReducedMotion();
   const { t } = useTranslation();
+  const translatedTypingPhrases = t('auth.login.heroTypingPhrases', { returnObjects: true });
+  const heroTypingPhrases = Array.isArray(translatedTypingPhrases)
+    ? translatedTypingPhrases
+    : [t('auth.login.heroTitle')];
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
@@ -138,7 +143,11 @@ export default function LoginPage() {
               <img src={icon} alt={t('app.productName')} className="h-full w-full object-contain" />
             </Stagger.Item>
             <Stagger.Item as="h1" className="mb-stack-md font-h1 text-h1 text-primary">
-              <span>{t('auth.login.heroTitle')}</span>
+              <Typewriter
+                phrases={heroTypingPhrases}
+                className="inline-block min-h-[1.05em]"
+                caretClassName="text-secondary"
+              />
             </Stagger.Item>
             <Stagger.Item as="p" className="font-body-lg text-body-lg leading-relaxed text-on-surface-variant">
               <span>{t('auth.login.heroDescription')}</span>

@@ -6,6 +6,8 @@ import { isValidEmail } from '../../utils/validation';
 import { useToast } from '../../components/useToast';
 import PublicNavBar from '../../components/PublicNavBar';
 import PublicFooter from '../../components/PublicFooter';
+import Reveal from '../../motion/Reveal';
+import Stagger from '../../motion/Stagger';
 
 const SUBJECT_OPTIONS = ['seeker', 'employer', 'technical', 'billing', 'other'];
 
@@ -66,16 +68,16 @@ export default function ContactPage() {
         {/* Main Content */}
         <main className="flex-grow w-full max-w-container-max-width mx-auto px-margin-desktop py-stack-lg flex flex-col gap-stack-lg">
           {/* Hero Section */}
-          <section className="text-center py-stack-lg max-w-2xl mx-auto">
+          <Reveal whenInView as="section" className="text-center py-stack-lg max-w-2xl mx-auto">
             <h1 className="font-h1 text-h1 text-primary mb-stack-md">{t('contact.heroTitle')}</h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant">
               {t('contact.heroDescription')}
             </p>
-          </section>
+          </Reveal>
           {/* Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+          <Stagger whenInView className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start" delayChildren={0.08} staggerChildren={0.08}>
             {/* Left Column: Form */}
-            <section className="lg:col-span-7 bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)]">
+            <Stagger.Item as="section" className="lg:col-span-7 bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)]">
               <h2 className="font-h2 text-h2 text-primary mb-stack-md">{t('contact.formTitle')}</h2>
               <form className="flex flex-col gap-stack-md" onSubmit={handleSubmit}>
                 <div className="flex flex-col md:flex-row gap-gutter">
@@ -112,9 +114,9 @@ export default function ContactPage() {
                   {!loading && <span className="material-symbols-outlined text-on-secondary" style={{ fontSize: 20 }}>send</span>}
                 </button>
               </form>
-            </section>
+            </Stagger.Item>
             {/* Right Column: Contact Info & FAQ */}
-            <section className="lg:col-span-5 flex flex-col gap-gutter">
+            <Stagger.Item as="section" className="lg:col-span-5 flex flex-col gap-gutter">
               <div className="bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] flex flex-col gap-stack-md">
                 <h3 className="font-h3 text-h3 text-primary mb-unit">{t('contact.info.title')}</h3>
                 <div className="flex items-start gap-stack-md">
@@ -160,8 +162,8 @@ export default function ContactPage() {
                   </div>
                 </div>
               </div>
-            </section>
-          </div>
+            </Stagger.Item>
+          </Stagger>
         </main>
         <PublicFooter />
       </div>

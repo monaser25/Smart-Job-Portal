@@ -69,9 +69,8 @@ export default function PublicJobsPage() {
   const initialFilters = {
     search: queryParams.get('search') || '',
     location: queryParams.get('location') || '',
-    category: queryParams.get('category') || '',
-    type: '',
   };
+  const initialCategories = queryParams.get('category') ? [queryParams.get('category')] : [];
 
   const [jobs, setJobs] = useState([]);
   const [meta, setMeta] = useState(null);
@@ -82,8 +81,8 @@ export default function PublicJobsPage() {
   const [recommendationNotice, setRecommendationNotice] = useState('');
   const [searchQuery, setSearchQuery] = useState(initialFilters.search);
   const [locationQuery, setLocationQuery] = useState(initialFilters.location);
-  const [categoryQuery, setCategoryQuery] = useState(initialFilters.category);
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState(initialCategories);
+  const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedExperienceLevels, setSelectedExperienceLevels] = useState([]);
   const [activeFilters, setActiveFilters] = useState(initialFilters);
   const [page, setPage] = useState(1);
@@ -124,9 +123,9 @@ export default function PublicJobsPage() {
           const filtered = filterJobs(recommendedJobs, {
             search: activeFilters.search,
             location: activeFilters.location,
-            selectedTypes: activeFilters.type ? [activeFilters.type] : [],
+            selectedTypes,
             selectedExperienceLevels,
-          }).filter((job) => !activeFilters.category || job.category === activeFilters.category);
+          }).filter((job) => !selectedCategories.length || selectedCategories.includes(job.category));
 
           if (!cancelled) {
             setJobs(filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0)));
@@ -135,13 +134,14 @@ export default function PublicJobsPage() {
           return;
         }
 
+        const selectedBackendTypes = selectedTypes.map((type) => TYPE_TO_BACKEND[type] || type);
         const payload = await jobsApi.getPublicJobs({
           page,
           per_page: itemsPerPage,
           keyword: activeFilters.search,
           location: activeFilters.location,
-          category: activeFilters.category || undefined,
-          job_type: activeFilters.type || undefined,
+          category: selectedCategories.join(',') || undefined,
+          job_type: selectedBackendTypes.join(',') || undefined,
           experience_level: selectedExperienceLevels.join(',') || undefined,
         });
         const resultData = Array.isArray(payload.data) ? payload.data : payload.data?.data || [];
@@ -150,9 +150,9 @@ export default function PublicJobsPage() {
         const filtered = filterJobs(normalizedJobs, {
           search: activeFilters.search,
           location: activeFilters.location,
-          selectedTypes: activeFilters.type ? [activeFilters.type] : [],
+          selectedTypes,
           selectedExperienceLevels,
-        }).filter((job) => !activeFilters.category || job.category === activeFilters.category);
+        }).filter((job) => !selectedCategories.length || selectedCategories.includes(job.category));
 
         if (!cancelled) {
           setJobs(filtered);
@@ -177,7 +177,7 @@ export default function PublicJobsPage() {
     return () => {
       cancelled = true;
     };
-  }, [activeFilters, mode, page, selectedExperienceLevels, user?.role, t]);
+  }, [activeFilters, mode, page, selectedCategories, selectedExperienceLevels, selectedTypes, user?.role, t]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -262,16 +262,16 @@ export default function PublicJobsPage() {
   };
 
   const toggleCategory = (category) => {
-    const nextCategory = categoryQuery === category ? '' : category;
-    setCategoryQuery(nextCategory);
-    setActiveFilters((prev) => ({ ...prev, category: nextCategory }));
+    setSelectedCategories((prev) =>
+      prev.includes(category) ? prev.filter((item) => item !== category) : [...prev, category]
+    );
     setPage(1);
   };
 
   const toggleType = (type) => {
-    const nextType = selectedType === type ? '' : type;
-    setSelectedType(nextType);
-    setActiveFilters((prev) => ({ ...prev, type: nextType ? TYPE_TO_BACKEND[nextType] : '' }));
+    setSelectedTypes((prev) =>
+      prev.includes(type) ? prev.filter((item) => item !== type) : [...prev, type]
+    );
     setPage(1);
   };
 
@@ -287,10 +287,10 @@ export default function PublicJobsPage() {
     setRecommendationNotice('');
     setSearchQuery('');
     setLocationQuery('');
-    setCategoryQuery('');
-    setSelectedType('');
+    setSelectedCategories([]);
+    setSelectedTypes([]);
     setSelectedExperienceLevels([]);
-    setActiveFilters({ search: '', location: '', category: '', type: '' });
+    setActiveFilters({ search: '', location: '' });
     setPage(1);
   };
 
@@ -316,8 +316,8 @@ export default function PublicJobsPage() {
     mode === 'recommended' ||
     searchQuery ||
     locationQuery ||
-    categoryQuery ||
-    selectedType ||
+    selectedCategories.length > 0 ||
+    selectedTypes.length > 0 ||
     selectedExperienceLevels.length > 0;
 
   const total = mode === 'recommended' ? jobs.length : meta?.total || jobs.length;
@@ -505,7 +505,7 @@ export default function PublicJobsPage() {
                         <input
                           type="checkbox"
                           className={filterCheckboxClass}
-                          checked={categoryQuery === category}
+                          checked={selectedCategories.includes(category)}
                           onChange={() => toggleCategory(category)}
                         />
                         <span className="min-w-0 break-words leading-relaxed">{t(`categories.${category}`)}</span>
@@ -522,7 +522,7 @@ export default function PublicJobsPage() {
                         <input
                           type="checkbox"
                           className={filterCheckboxClass}
-                          checked={selectedType === type}
+                          checked={selectedTypes.includes(type)}
                           onChange={() => toggleType(type)}
                         />
                         <span className="min-w-0 break-words leading-relaxed">{t(`jobTypesLabels.${type}`)}</span>
@@ -568,7 +568,7 @@ export default function PublicJobsPage() {
                     <p className="font-body-md text-on-surface-variant">
                       {t('publicJobs.results.showing')} <span className="font-semibold text-primary">{mode === 'recommended' ? jobs.length : total}</span> {t(`publicJobs.results.modes.${mode}`)}
                     </p>
-                    {(categoryQuery || mode === 'recommended' || selectedExperienceLevels.length > 0) && (
+                    {(selectedCategories.length > 0 || mode === 'recommended' || selectedExperienceLevels.length > 0) && (
                       <div className="flex flex-wrap items-center gap-2">
                         {mode === 'recommended' && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-secondary-container px-3 py-1 font-label-sm text-on-secondary-container shadow-sm">
@@ -576,12 +576,12 @@ export default function PublicJobsPage() {
                             {t('publicJobs.results.recommendedTag')}
                           </span>
                         )}
-                        {categoryQuery && (
-                          <span className="inline-flex min-w-0 items-center gap-1 rounded-full bg-secondary-container px-3 py-1 font-label-sm text-on-secondary-container shadow-sm">
-                            <span className="min-w-0 break-words">{t('publicJobs.results.categoryTag', { name: t(`categories.${categoryQuery}`, { defaultValue: categoryQuery }) })}</span>
-                            <button onClick={() => toggleCategory(categoryQuery)} className="material-symbols-outlined text-[14px] transition-colors hover:text-error" type="button">close</button>
+                        {selectedCategories.map((category) => (
+                          <span key={category} className="inline-flex min-w-0 items-center gap-1 rounded-full bg-secondary-container px-3 py-1 font-label-sm text-on-secondary-container shadow-sm">
+                            <span className="min-w-0 break-words">{t('publicJobs.results.categoryTag', { name: t(`categories.${category}`, { defaultValue: category }) })}</span>
+                            <button onClick={() => toggleCategory(category)} className="material-symbols-outlined text-[14px] transition-colors hover:text-error" type="button">close</button>
                           </span>
-                        )}
+                        ))}
                         {selectedExperienceLevels.map((level) => (
                           <span key={level} className="inline-flex min-w-0 items-center gap-1 rounded-full bg-secondary-container px-3 py-1 font-label-sm text-on-secondary-container shadow-sm">
                             <span className="min-w-0 break-words">{t(`experienceLevels.${level}`)}</span>

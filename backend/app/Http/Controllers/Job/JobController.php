@@ -42,11 +42,21 @@ class JobController extends Controller
         }
 
         if ($request->filled('job_type')) {
-            $query->where('job_type', $request->job_type);
+            $types = is_array($request->job_type) ? $request->job_type : explode(',', (string) $request->job_type);
+            $types = array_values(array_filter(array_map(fn ($type) => trim((string) $type), $types)));
+
+            if (!empty($types)) {
+                $query->whereIn('job_type', $types);
+            }
         }
 
         if ($request->filled('category')) {
-            $query->where('category', $request->category);
+            $categories = is_array($request->category) ? $request->category : explode(',', (string) $request->category);
+            $categories = array_values(array_filter(array_map(fn ($category) => trim((string) $category), $categories)));
+
+            if (!empty($categories)) {
+                $query->whereIn('category', $categories);
+            }
         }
 
         if ($request->filled('experience_level')) {
