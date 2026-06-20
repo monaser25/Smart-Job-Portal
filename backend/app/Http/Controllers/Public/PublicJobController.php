@@ -33,12 +33,26 @@ class PublicJobController extends Controller
             ->when($request->location, fn ($q, $l) =>
                 $q->where('location', 'like', "%$l%")
             )
-            ->when($request->job_type, fn ($q, $t) =>
-                $q->where('job_type', $t)
-            )
-            ->when($request->category, fn ($q, $c) =>
-                $q->where('category', $c)
-            )
+            ->when($request->job_type, function ($q, $types) {
+                $types = is_array($types) ? $types : explode(',', (string) $types);
+                $types = array_values(array_filter(array_map(fn ($type) => trim((string) $type), $types)));
+
+                if (empty($types)) {
+                    return;
+                }
+
+                $q->whereIn('job_type', $types);
+            })
+            ->when($request->category, function ($q, $categories) {
+                $categories = is_array($categories) ? $categories : explode(',', (string) $categories);
+                $categories = array_values(array_filter(array_map(fn ($category) => trim((string) $category), $categories)));
+
+                if (empty($categories)) {
+                    return;
+                }
+
+                $q->whereIn('category', $categories);
+            })
             ->when($request->experience_level, fn ($q, $levels) =>
                 $this->applyExperienceLevelFilter($q, $levels)
             )

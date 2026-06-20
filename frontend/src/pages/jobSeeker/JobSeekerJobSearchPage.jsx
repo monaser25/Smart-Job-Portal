@@ -49,10 +49,10 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
   const [mode, setMode] = useState(initialMode);
   const [searchQuery, setSearchQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('');
-  const [categoryQuery, setCategoryQuery] = useState('');
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedExperienceLevels, setSelectedExperienceLevels] = useState([]);
-  const [activeFilters, setActiveFilters] = useState({ search: '', location: '', category: '', type: '' });
+  const [activeFilters, setActiveFilters] = useState({ search: '', location: '' });
   const [page, setPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [showJobSuggestions, setShowJobSuggestions] = useState(false);
@@ -85,21 +85,27 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
           const filtered = filterJobs(recommendedJobs, {
             search: activeFilters.search,
             location: activeFilters.location,
-            selectedTypes: activeFilters.type ? [activeFilters.type] : [],
+            selectedTypes,
             selectedExperienceLevels,
-          }).filter((job) => !activeFilters.category || job.category === activeFilters.category);
+          }).filter((job) => !selectedCategories.length || selectedCategories.includes(job.category));
 
           setJobs(filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0)));
           return;
         }
 
-        const result = await getJobs({ ...activeFilters, experienceLevels: selectedExperienceLevels });
+        const selectedBackendTypes = selectedTypes.map((type) => TYPE_TO_BACKEND[type] || type);
+        const result = await getJobs({
+          ...activeFilters,
+          type: selectedBackendTypes.join(',') || undefined,
+          category: selectedCategories.join(',') || undefined,
+          experienceLevels: selectedExperienceLevels,
+        });
         const filtered = filterJobs(result, {
           search: activeFilters.search,
           location: activeFilters.location,
-          selectedTypes: activeFilters.type ? [activeFilters.type] : [],
+          selectedTypes,
           selectedExperienceLevels,
-        }).filter((job) => !activeFilters.category || job.category === activeFilters.category);
+        }).filter((job) => !selectedCategories.length || selectedCategories.includes(job.category));
 
         setJobs(filtered);
       } catch (error) {
@@ -112,7 +118,7 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
     };
 
     fetchJobs();
-  }, [activeFilters, mode, selectedExperienceLevels]);
+  }, [activeFilters, mode, selectedCategories, selectedExperienceLevels, selectedTypes]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -184,16 +190,16 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
   };
 
   const toggleCategory = (category) => {
-    const nextCategory = categoryQuery === category ? '' : category;
-    setCategoryQuery(nextCategory);
-    setActiveFilters((prev) => ({ ...prev, category: nextCategory }));
+    setSelectedCategories((prev) =>
+      prev.includes(category) ? prev.filter((item) => item !== category) : [...prev, category]
+    );
     setPage(1);
   };
 
   const toggleType = (type) => {
-    const nextType = selectedType === type ? '' : type;
-    setSelectedType(nextType);
-    setActiveFilters((prev) => ({ ...prev, type: nextType ? TYPE_TO_BACKEND[nextType] : '' }));
+    setSelectedTypes((prev) =>
+      prev.includes(type) ? prev.filter((item) => item !== type) : [...prev, type]
+    );
     setPage(1);
   };
 
@@ -208,10 +214,10 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
     setMode('all');
     setSearchQuery('');
     setLocationQuery('');
-    setCategoryQuery('');
-    setSelectedType('');
+    setSelectedCategories([]);
+    setSelectedTypes([]);
     setSelectedExperienceLevels([]);
-    setActiveFilters({ search: '', location: '', category: '', type: '' });
+    setActiveFilters({ search: '', location: '' });
     setPage(1);
   };
 
@@ -219,8 +225,8 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
     mode === 'recommended' ||
     searchQuery ||
     locationQuery ||
-    categoryQuery ||
-    selectedType ||
+    selectedCategories.length > 0 ||
+    selectedTypes.length > 0 ||
     selectedExperienceLevels.length > 0;
 
   const currentPage = page;
@@ -370,7 +376,7 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
                     <input
                       type="checkbox"
                       className="accent-[#2563EB] w-4 h-4 rounded"
-                      checked={categoryQuery === category}
+                      checked={selectedCategories.includes(category)}
                       onChange={() => toggleCategory(category)}
                     />
                     {t(`categories.${category}`)}
@@ -387,7 +393,7 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
                     <input
                       type="checkbox"
                       className="accent-[#2563EB] w-4 h-4 rounded"
-                      checked={selectedType === type}
+                      checked={selectedTypes.includes(type)}
                       onChange={() => toggleType(type)}
                     />
                     {t(`jobTypesLabels.${type}`)}
@@ -427,7 +433,7 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
               <p className="font-body-md text-on-surface-variant">
                 {t('publicJobs.results.showing')} <span className="font-semibold text-primary">{jobs.length}</span> {t(`publicJobs.results.modes.${mode}`)}
               </p>
-              {(categoryQuery || mode === 'recommended') && (
+              {(selectedCategories.length > 0 || mode === 'recommended') && (
                 <div className="flex flex-wrap items-center gap-2">
                   {mode === 'recommended' && (
                     <span className="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-sm flex items-center gap-1">
@@ -435,12 +441,12 @@ export default function JobSeekerJobSearchPage({ initialMode = 'all' }) {
                       {t('publicJobs.results.recommendedTag')}
                     </span>
                   )}
-                  {categoryQuery && (
-                    <span className="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-sm flex items-center gap-1">
-                      {t('publicJobs.results.categoryTag', { name: t(`categories.${categoryQuery}`, { defaultValue: categoryQuery }) })}
-                      <button onClick={() => toggleCategory(categoryQuery)} className="material-symbols-outlined text-[14px] hover:text-error transition-colors" type="button">close</button>
+                  {selectedCategories.map((category) => (
+                    <span key={category} className="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-sm flex items-center gap-1">
+                      {t('publicJobs.results.categoryTag', { name: t(`categories.${category}`, { defaultValue: category }) })}
+                      <button onClick={() => toggleCategory(category)} className="material-symbols-outlined text-[14px] hover:text-error transition-colors" type="button">close</button>
                     </span>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
