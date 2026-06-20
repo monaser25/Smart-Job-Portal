@@ -19,6 +19,8 @@ import { useValidationErrors } from '../../hooks/useValidationErrors';
 import { companyDataService } from '../../services/companyDataService';
 import { companyApi } from '../../api/companyApi';
 import { ROUTES } from '../../utils/constants';
+import Stagger from '../../motion/Stagger';
+import Reveal from '../../motion/Reveal';
 
 const salary = (job) => `$${Math.round(job.salaryMin / 1000)}k - $${Math.round(job.salaryMax / 1000)}k`;
 const jobParam = (params) => params.jobId || params.id;
@@ -505,43 +507,53 @@ export function CompanyDashboard() {
       />
 
       {/* Overview Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
-        <CompanyStatsCard icon="work" label={t('companyFlow.dashboard.totalJobs')} to={ROUTES.COMPANY_JOBS} value={stats.total_jobs} />
-        <CompanyStatsCard icon="work_outline" label={t('companyFlow.dashboard.activeJobs')} to={ROUTES.COMPANY_JOBS} value={stats.active_jobs} />
-        <CompanyStatsCard icon="group" label={t('companyFlow.dashboard.totalApplicants')} to={ROUTES.COMPANY_APPLICANTS} value={stats.total_applicants} />
-        <CompanyStatsCard icon="new_releases" label={t('companyFlow.dashboard.newThisWeek')} to={ROUTES.COMPANY_APPLICANTS} value={stats.new_applicants_this_week} />
-      </div>
+      <Stagger as="div" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter" delayChildren={0.05} staggerChildren={0.07}>
+        <Stagger.Item>
+          <CompanyStatsCard icon="work" label={t('companyFlow.dashboard.totalJobs')} to={ROUTES.COMPANY_JOBS} value={stats.total_jobs} />
+        </Stagger.Item>
+        <Stagger.Item>
+          <CompanyStatsCard icon="work_outline" label={t('companyFlow.dashboard.activeJobs')} to={ROUTES.COMPANY_JOBS} value={stats.active_jobs} />
+        </Stagger.Item>
+        <Stagger.Item>
+          <CompanyStatsCard icon="group" label={t('companyFlow.dashboard.totalApplicants')} to={ROUTES.COMPANY_APPLICANTS} value={stats.total_applicants} />
+        </Stagger.Item>
+        <Stagger.Item>
+          <CompanyStatsCard icon="new_releases" label={t('companyFlow.dashboard.newThisWeek')} to={ROUTES.COMPANY_APPLICANTS} value={stats.new_applicants_this_week} />
+        </Stagger.Item>
+      </Stagger>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-gutter">
         {/* Main Content Area */}
         <div className="xl:col-span-2 flex flex-col gap-gutter">
-          <Section title={t('companyFlow.dashboard.recentApplicants')}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-stack-md">
-              {stats.recent_applicants?.map((applicant) => {
-                const isShortlisted = String(applicant.status || '').toLowerCase() === 'shortlisted';
-                return (
-                  <div key={applicant.applicationId} className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-sm hover:shadow-hover transition-shadow flex flex-col justify-between gap-4">
-                    <div>
-                      <div className="flex justify-between items-start mb-2">
-                        <p className="font-h3 text-primary truncate pe-2">{applicant.name}</p>
-                        <span className="bg-secondary/10 text-secondary text-xs font-bold px-2 py-1 rounded-full shrink-0">
-                          {t('companyFlow.dashboard.percentMatch', { percent: applicant.matchScore })}
-                        </span>
+          <Reveal whenInView>
+            <Section title={t('companyFlow.dashboard.recentApplicants')}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-stack-md">
+                {stats.recent_applicants?.map((applicant) => {
+                  const isShortlisted = String(applicant.status || '').toLowerCase() === 'shortlisted';
+                  return (
+                    <div key={applicant.applicationId} className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-sm hover:shadow-hover transition-shadow flex flex-col justify-between gap-4">
+                      <div>
+                        <div className="flex justify-between items-start mb-2">
+                          <p className="font-h3 text-primary truncate pe-2">{applicant.name}</p>
+                          <span className="bg-secondary/10 text-secondary text-xs font-bold px-2 py-1 rounded-full shrink-0">
+                            {t('companyFlow.dashboard.percentMatch', { percent: applicant.matchScore })}
+                          </span>
+                        </div>
+                        <p className="text-sm text-on-surface-variant flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-[16px]">work</span>
+                          <span className="truncate">{applicant.job_title || applicant.title || t('companyFlow.dashboard.jobApplication')}</span>
+                        </p>
                       </div>
-                      <p className="text-sm text-on-surface-variant flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-[16px]">work</span>
-                        <span className="truncate">{applicant.job_title || applicant.title || t('companyFlow.dashboard.jobApplication')}</span>
-                      </p>
+                      <button onClick={() => setShortlistTarget({ ...applicant, nextStatus: isShortlisted ? 'under_review' : 'shortlisted' })} className={`w-full mt-2 text-center py-2 font-label-md rounded-lg transition-colors border ${isShortlisted ? 'border-outline-variant text-primary hover:bg-surface-container-high' : 'border-secondary/30 bg-surface-container-highest hover:bg-secondary/10 text-secondary'}`}>
+                        {isShortlisted ? t('companyFlow.dashboard.unshortlistButton') : t('companyFlow.dashboard.shortlistButton')}
+                      </button>
                     </div>
-                    <button onClick={() => setShortlistTarget({ ...applicant, nextStatus: isShortlisted ? 'under_review' : 'shortlisted' })} className={`w-full mt-2 text-center py-2 font-label-md rounded-lg transition-colors border ${isShortlisted ? 'border-outline-variant text-primary hover:bg-surface-container-high' : 'border-secondary/30 bg-surface-container-highest hover:bg-secondary/10 text-secondary'}`}>
-                      {isShortlisted ? t('companyFlow.dashboard.unshortlistButton') : t('companyFlow.dashboard.shortlistButton')}
-                    </button>
-                  </div>
-                )
-              })}
-              {!stats.recent_applicants?.length && <p className="text-on-surface-variant p-4">{t('companyFlow.dashboard.noRecentApplicants')}</p>}
-            </div>
-          </Section>
+                  )
+                })}
+                {!stats.recent_applicants?.length && <p className="text-on-surface-variant p-4">{t('companyFlow.dashboard.noRecentApplicants')}</p>}
+              </div>
+            </Section>
+          </Reveal>
 
           <Section title={t('companyFlow.dashboard.topPerformingJobs')}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-stack-md">
@@ -564,39 +576,41 @@ export function CompanyDashboard() {
 
         {/* Sidebar Area */}
         <div className="flex flex-col gap-gutter">
-          <Section title={t('companyFlow.dashboard.hiringPipeline')}>
-            <div className="flex flex-col gap-stack-sm">
-              <Link to={ROUTES.COMPANY_APPLICANTS} className="bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-4 border border-outline-variant flex justify-between items-center group">
-                <span className="text-on-surface-variant group-hover:text-primary transition-colors flex items-center gap-3 font-medium">
-                  <div className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">hourglass_top</span>
-                  </div>
-                  {t('companyFlow.dashboard.underReview')}
-                </span>
-                <span className="font-h2 text-primary">{stats.under_review}</span>
-              </Link>
+          <Reveal whenInView>
+            <Section title={t('companyFlow.dashboard.hiringPipeline')}>
+              <div className="flex flex-col gap-stack-sm">
+                <Link to={ROUTES.COMPANY_APPLICANTS} className="bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-4 border border-outline-variant flex justify-between items-center group">
+                  <span className="text-on-surface-variant group-hover:text-primary transition-colors flex items-center gap-3 font-medium">
+                    <div className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[18px]">hourglass_top</span>
+                    </div>
+                    {t('companyFlow.dashboard.underReview')}
+                  </span>
+                  <span className="font-h2 text-primary">{stats.under_review}</span>
+                </Link>
 
-              <Link to={ROUTES.COMPANY_APPLICANTS} className="bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-4 border border-outline-variant flex justify-between items-center group">
-                <span className="text-on-surface-variant group-hover:text-primary transition-colors flex items-center gap-3 font-medium">
-                  <div className="w-8 h-8 rounded-full bg-success/10 text-success flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">check_circle</span>
-                  </div>
-                  {t('companyFlow.dashboard.shortlisted')}
-                </span>
-                <span className="font-h2 text-primary">{stats.shortlisted}</span>
-              </Link>
+                <Link to={ROUTES.COMPANY_APPLICANTS} className="bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-4 border border-outline-variant flex justify-between items-center group">
+                  <span className="text-on-surface-variant group-hover:text-primary transition-colors flex items-center gap-3 font-medium">
+                    <div className="w-8 h-8 rounded-full bg-success/10 text-success flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                    </div>
+                    {t('companyFlow.dashboard.shortlisted')}
+                  </span>
+                  <span className="font-h2 text-primary">{stats.shortlisted}</span>
+                </Link>
 
-              <Link to={ROUTES.COMPANY_APPLICANTS} className="bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-4 border border-outline-variant flex justify-between items-center group">
-                <span className="text-on-surface-variant group-hover:text-primary transition-colors flex items-center gap-3 font-medium">
-                  <div className="w-8 h-8 rounded-full bg-error/10 text-error flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">cancel</span>
-                  </div>
-                  {t('companyFlow.dashboard.rejected')}
-                </span>
-                <span className="font-h2 text-primary">{stats.rejected}</span>
-              </Link>
-            </div>
-          </Section>
+                <Link to={ROUTES.COMPANY_APPLICANTS} className="bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-4 border border-outline-variant flex justify-between items-center group">
+                  <span className="text-on-surface-variant group-hover:text-primary transition-colors flex items-center gap-3 font-medium">
+                    <div className="w-8 h-8 rounded-full bg-error/10 text-error flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[18px]">cancel</span>
+                    </div>
+                    {t('companyFlow.dashboard.rejected')}
+                  </span>
+                  <span className="font-h2 text-primary">{stats.rejected}</span>
+                </Link>
+              </div>
+            </Section>
+          </Reveal>
         </div>
       </div>
       {modals}

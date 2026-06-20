@@ -1964,6 +1964,12 @@
   "auth": {
     "login": {
       "heroTitle": "Your next career move awaits.",
+      "heroTypingPhrases": [
+        "Your next career move awaits.",
+        "Your dream role is one click away.",
+        "Smarter matches, faster hires.",
+        "Let AI find your perfect fit."
+      ],
       "heroDescription": "Log in to access personalized job matches, track your applications, and connect with top employers.",
       "welcomeBack": "Welcome Back!",
       "subtitle": "Log in to Smart Job Portal.",
