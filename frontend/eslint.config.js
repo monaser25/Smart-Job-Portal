@@ -23,4 +23,9 @@ export default defineConfig([
       'no-unused-vars': ['error', { caughtErrors: 'none' }],
     },
   },
+  {
+    // Build/tooling config files run in Node (CommonJS require, module, process).
+    files: ['*.config.js', 'postcss.config.js', 'tailwind.config.js'],
+    languageOptions: { globals: globals.node },
+  },
 ])
