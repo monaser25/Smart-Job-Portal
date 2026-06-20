@@ -56,6 +56,8 @@ class CompanyDashboardController extends Controller
                                             ->count(),
             'shortlisted'              => Application::whereIn('job_id', $jobIds)
                                             ->where('status', 'shortlisted')->count(),
+            'approved'                 => Application::whereIn('job_id', $jobIds)
+                                            ->where('status', 'approved')->count(),
             'rejected'                 => Application::whereIn('job_id', $jobIds)
                                             ->where('status', 'rejected')->count(),
             'under_review'             => Application::whereIn('job_id', $jobIds)

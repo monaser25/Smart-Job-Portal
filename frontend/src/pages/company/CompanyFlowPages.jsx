@@ -601,6 +601,16 @@ export function CompanyDashboard() {
 
                 <Link to={ROUTES.COMPANY_APPLICANTS} className="bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-4 border border-outline-variant flex justify-between items-center group">
                   <span className="text-on-surface-variant group-hover:text-primary transition-colors flex items-center gap-3 font-medium">
+                    <div className="w-8 h-8 rounded-full bg-success/10 text-success flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[18px]">task_alt</span>
+                    </div>
+                    {t('companyFlow.dashboard.approved')}
+                  </span>
+                  <span className="font-h2 text-primary">{stats.approved}</span>
+                </Link>
+
+                <Link to={ROUTES.COMPANY_APPLICANTS} className="bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-4 border border-outline-variant flex justify-between items-center group">
+                  <span className="text-on-surface-variant group-hover:text-primary transition-colors flex items-center gap-3 font-medium">
                     <div className="w-8 h-8 rounded-full bg-error/10 text-error flex items-center justify-center">
                       <span className="material-symbols-outlined text-[18px]">cancel</span>
                     </div>

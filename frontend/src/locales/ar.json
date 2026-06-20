@@ -837,6 +837,7 @@
       "hiringPipeline": "خط أنابيب التوظيف",
       "underReview": "قيد المراجعة",
       "shortlisted": "ضمن القائمة المختصرة",
+      "approved": "مقبول",
       "rejected": "مرفوض",
       "errorTitle": "خطأ في تحميل لوحة التحكم"
     },

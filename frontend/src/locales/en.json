@@ -825,6 +825,7 @@
       "hiringPipeline": "Hiring Pipeline",
       "underReview": "Under review",
       "shortlisted": "Shortlisted",
+      "approved": "Approved",
       "rejected": "Rejected",
       "errorTitle": "Error loading dashboard"
     },
