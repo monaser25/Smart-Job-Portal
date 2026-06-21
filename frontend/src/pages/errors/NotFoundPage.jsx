@@ -52,7 +52,7 @@ export default function NotFoundPage() {
         {/* Footer Component from JSON */}
         <footer className="bg-surface-container-highest dark:bg-surface-dim text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm uppercase tracking-wider full-width border-t border-outline-variant flat no shadows w-full py-stack-lg px-margin-desktop flex justify-between items-center max-w-container-max-width mx-auto">
           <div>
-            © 2024 Smart Job Portal. Intelligence in Recruitment.
+            © 2026 Smart Job Portal. Intelligence in Recruitment.
           </div>
           <nav className="flex gap-gutter">
             <Link className="text-on-surface-variant hover:text-secondary hover:underline decoration-secondary transition-all Hover: opacity-80" to={ROUTES.PRIVACY}>Privacy</Link>
