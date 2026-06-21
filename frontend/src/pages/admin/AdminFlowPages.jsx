@@ -14,6 +14,7 @@ import CompanySkillTag from '../../components/company/CompanySkillTag';
 import { useToast } from '../../components/useToast';
 import { adminDataService } from '../../services/adminDataService';
 import { adminApi } from '../../api/adminApi';
+import { getContactInfo } from '../../services/publicDataService';
 import { useAuth } from '../../context/useAuth';
 import { ROUTES } from '../../utils/constants';
 import Stagger from '../../motion/Stagger';
@@ -973,6 +974,8 @@ export function AdminSettings() {
   });
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [contactInfo, setContactInfo] = useState({ email: '', phone: '', location: '' });
+  const [savingContactInfo, setSavingContactInfo] = useState(false);
 
   const [unlockState, setUnlockState] = useState({ email: false, password: false });
   const [verifyInput, setVerifyInput] = useState('');
@@ -990,7 +993,26 @@ export function AdminSettings() {
     }
   }, [user]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    getContactInfo().then((loadedContactInfo) => {
+      if (!mounted) return;
+
+      setContactInfo({
+        email: loadedContactInfo.email || '',
+        phone: loadedContactInfo.phone || '',
+        location: loadedContactInfo.location || '',
+      });
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const update = (key, value) => setSettings((prev) => ({ ...prev, [key]: value }));
+  const updateContactField = (key, value) => setContactInfo((prev) => ({ ...prev, [key]: value }));
 
   const startVerify = (target) => {
     setVerifyTarget(target);
@@ -1056,6 +1078,32 @@ export function AdminSettings() {
       addToast({ title: t('adminFlow.settings.updateFailedTitle'), message: e?.response?.data?.message || t('adminFlow.settings.updateFailedMessage'), type: 'error' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const saveContactInfo = async () => {
+    setSavingContactInfo(true);
+    try {
+      const savedContactInfo = await adminApi.updateContactInfo(contactInfo);
+
+      setContactInfo({
+        email: savedContactInfo?.email || '',
+        phone: savedContactInfo?.phone || '',
+        location: savedContactInfo?.location || '',
+      });
+      addToast({
+        title: t('adminFlow.settings.contactInfo.savedTitle'),
+        message: t('adminFlow.settings.contactInfo.savedMessage'),
+        type: 'success',
+      });
+    } catch {
+      addToast({
+        title: t('adminFlow.settings.contactInfo.failedTitle'),
+        message: t('adminFlow.settings.contactInfo.failedMessage'),
+        type: 'error',
+      });
+    } finally {
+      setSavingContactInfo(false);
     }
   };
 
@@ -1149,6 +1197,41 @@ export function AdminSettings() {
             {saving ? t('adminFlow.saving') : t('adminFlow.settings.saveChanges')}
           </button>
         </div>
+
+        <Section title={t('adminFlow.settings.contactInfo.title')}>
+          <p className="text-on-surface-variant font-body-sm">
+            {t('adminFlow.settings.contactInfo.description')}
+          </p>
+          <div className="grid grid-cols-1 gap-6">
+            <Field label={t('adminFlow.settings.contactInfo.emailLabel')}>
+              <TextInput
+                type="email"
+                onChange={(e) => updateContactField('email', e.target.value)}
+                value={contactInfo.email}
+              />
+            </Field>
+            <Field label={t('adminFlow.settings.contactInfo.phoneLabel')}>
+              <TextInput
+                type="text"
+                onChange={(e) => updateContactField('phone', e.target.value)}
+                value={contactInfo.phone}
+              />
+            </Field>
+            <Field label={t('adminFlow.settings.contactInfo.locationLabel')}>
+              <TextInput
+                type="text"
+                onChange={(e) => updateContactField('location', e.target.value)}
+                value={contactInfo.location}
+              />
+            </Field>
+          </div>
+          <div className="flex justify-end">
+            <button className={buttonPrimary} disabled={savingContactInfo} onClick={saveContactInfo}>
+              <span className="material-symbols-outlined text-[20px]">save</span>
+              {savingContactInfo ? t('adminFlow.saving') : t('adminFlow.settings.contactInfo.save')}
+            </button>
+          </div>
+        </Section>
       </div>
     </>
   );

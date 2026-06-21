@@ -1337,7 +1337,19 @@
       "changePassword": "Change Password",
       "newPassword": "New Password",
       "confirmNewPassword": "Confirm New Password",
-      "saveChanges": "Save Changes"
+      "saveChanges": "Save Changes",
+      "contactInfo": {
+        "title": "Contact Information",
+        "description": "Update the email, phone, and location shown on the public Contact page.",
+        "emailLabel": "Email",
+        "phoneLabel": "Phone",
+        "locationLabel": "Location",
+        "save": "Save",
+        "savedTitle": "Saved",
+        "savedMessage": "Contact information updated.",
+        "failedTitle": "Update failed",
+        "failedMessage": "Could not update contact information."
+      }
     },
     "userDetails": {
       "eyebrow": "User Details",

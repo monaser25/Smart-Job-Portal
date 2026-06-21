@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\Application;
 use App\Models\JobPost;
+use App\Models\SiteSetting;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -189,5 +190,28 @@ class AdminController extends Controller
         $user->save();
         
         return $this->success($user, 'Settings updated successfully.');
+    }
+
+    public function updateContactInfo(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:50',
+            'location' => 'nullable|string|max:255',
+        ]);
+
+        $setting = SiteSetting::query()->first() ?? new SiteSetting();
+        $setting->fill([
+            'contact_email' => $validated['email'] ?? null,
+            'contact_phone' => $validated['phone'] ?? null,
+            'contact_location' => $validated['location'] ?? null,
+        ]);
+        $setting->save();
+
+        return $this->success([
+            'email' => $setting->contact_email,
+            'phone' => $setting->contact_phone,
+            'location' => $setting->contact_location,
+        ]);
     }
 }

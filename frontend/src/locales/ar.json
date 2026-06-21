@@ -1349,7 +1349,19 @@
       "changePassword": "تغيير كلمة المرور",
       "newPassword": "كلمة المرور الجديدة",
       "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
-      "saveChanges": "حفظ التغييرات"
+      "saveChanges": "حفظ التغييرات",
+      "contactInfo": {
+        "title": "معلومات التواصل",
+        "description": "حدّث البريد الإلكتروني والهاتف والموقع الظاهرين في صفحة التواصل العامة.",
+        "emailLabel": "البريد الإلكتروني",
+        "phoneLabel": "الهاتف",
+        "locationLabel": "الموقع",
+        "save": "حفظ",
+        "savedTitle": "تم الحفظ",
+        "savedMessage": "تم تحديث معلومات التواصل.",
+        "failedTitle": "فشل التحديث",
+        "failedMessage": "تعذّر تحديث معلومات التواصل."
+      }
     },
     "userDetails": {
       "eyebrow": "تفاصيل المستخدم",

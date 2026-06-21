@@ -1,5 +1,6 @@
 import { jobsService } from '../api/jobsService';
 import { companyService } from '../api/companyService';
+import { apiRequest } from '../api/httpClient';
 
 const toPositiveNumber = (value) => {
   const number = Number(String(value ?? '').replace(/[^\d.]/g, ''));
@@ -103,6 +104,15 @@ export const getPublicCompanies = async (filters = {}) => {
   const data = await companyService.listPublicCompanies(filters);
   const items = Array.isArray(data) ? data : (data?.data || []);
   return items.map(normalizePublicCompany);
+};
+
+export const getContactInfo = async () => {
+  try {
+    const response = await apiRequest('/public/contact-info');
+    return response?.data ?? response ?? {};
+  } catch {
+    return {};
+  }
 };
 
 export const getPublicCompanyById = async (id) => {

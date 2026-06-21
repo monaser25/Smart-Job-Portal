@@ -15,6 +15,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Public\PublicCompanyController;
 use App\Http\Controllers\Public\PublicJobController;
+use App\Http\Controllers\Public\PublicSettingController;
 use App\Http\Controllers\Seeker\SavedJobController;
 use App\Http\Controllers\Skill\SkillController;
 use App\Http\Controllers\MessageController;
@@ -27,6 +28,7 @@ Route::prefix('public')->group(function () {
     Route::get('companies',           [PublicCompanyController::class, 'index']);
     Route::get('companies/{company}', [PublicCompanyController::class, 'show']);
     Route::get('skills',              [SkillController::class, 'index']);
+    Route::get('contact-info',        [PublicSettingController::class, 'contactInfo']);
 });
 
 // ── AUTH (public, throttled) ──────────────────────────────
@@ -134,5 +136,6 @@ Route::middleware(['auth:sanctum', 'verified', 'ban.check'])->group(function () 
         Route::patch('users/{user}/verify', [AdminController::class, 'verifyUser']);
         Route::post('verify-password',   [AdminController::class, 'verifyPassword']);
         Route::put('settings',           [AdminController::class, 'updateSettings']);
+        Route::put('contact-info',       [AdminController::class, 'updateContactInfo']);
     });
 });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../utils/constants';
@@ -8,6 +8,7 @@ import PublicNavBar from '../../components/PublicNavBar';
 import PublicFooter from '../../components/PublicFooter';
 import Reveal from '../../motion/Reveal';
 import Stagger from '../../motion/Stagger';
+import { getContactInfo } from '../../services/publicDataService';
 
 const SUBJECT_OPTIONS = ['seeker', 'employer', 'technical', 'billing', 'other'];
 
@@ -18,6 +19,19 @@ export default function ContactPage() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
+  const [contactInfo, setContactInfo] = useState({});
+
+  useEffect(() => {
+    let mounted = true;
+
+    getContactInfo().then((loadedContactInfo) => {
+      if (mounted) setContactInfo(loadedContactInfo || {});
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const validate = () => {
     const e = {};
@@ -60,6 +74,10 @@ export default function ContactPage() {
       setLoading(false);
     }
   };
+
+  const emailValue = contactInfo.email || t('contact.info.emailValue');
+  const phoneValue = contactInfo.phone || t('contact.info.phoneValue');
+  const locationValue = contactInfo.location || t('contact.info.locationLine1');
 
   return (
     <div className="stitch-page bg-background text-on-background font-body-md text-body-md min-h-screen flex flex-col">
@@ -125,7 +143,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-unit">{t('contact.info.emailLabel')}</p>
-                    <a className="font-body-lg text-body-lg text-secondary hover:underline" href={`mailto:${t('contact.info.emailValue')}`}>{t('contact.info.emailValue')}</a>
+                    <a className="font-body-lg text-body-lg text-secondary hover:underline" href={`mailto:${emailValue}`}>{emailValue}</a>
                   </div>
                 </div>
                 <div className="flex items-start gap-stack-md">
@@ -134,7 +152,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-unit">{t('contact.info.phoneLabel')}</p>
-                    <p className="font-body-lg text-body-lg text-on-background" dir="ltr">{t('contact.info.phoneValue')}</p>
+                    <p className="font-body-lg text-body-lg text-on-background" dir="ltr">{phoneValue}</p>
                     <p className="font-body-md text-body-md text-on-surface-variant mt-unit">{t('contact.info.phoneHours')}</p>
                   </div>
                 </div>
@@ -144,7 +162,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-unit">{t('contact.info.locationLabel')}</p>
-                    <p className="font-body-lg text-body-lg text-on-background">{t('contact.info.locationLine1')}</p>
+                    <p className="font-body-lg text-body-lg text-on-background">{locationValue}</p>
                     <p className="font-body-md text-body-md text-on-surface-variant">{t('contact.info.locationLine2')}</p>
                   </div>
                 </div>
