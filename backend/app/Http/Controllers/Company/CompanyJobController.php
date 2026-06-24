@@ -159,10 +159,15 @@ class CompanyJobController extends Controller
             return $this->error('Forbidden.', 403);
         }
 
-        $job->update(['is_active' => !$job->is_active]);
+        $isActive = !$job->is_active;
+        $job->update([
+            'is_active' => $isActive,
+            'status'    => $isActive ? 'active' : 'paused',
+        ]);
+
         return $this->success(
             new JobResource($job->fresh()),
-            $job->is_active ? 'Job activated.' : 'Job paused.'
+            $isActive ? 'Job activated.' : 'Job paused.'
         );
     }
 }

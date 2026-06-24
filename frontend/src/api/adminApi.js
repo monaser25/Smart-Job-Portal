@@ -38,4 +38,8 @@ export const adminApi = {
   updateSettings(payload) {
     return api.put('/admin/settings', payload).then(unwrap);
   },
+
+  updateContactInfo(payload) {
+    return api.put('/admin/contact-info', payload).then(unwrap);
+  },
 };
